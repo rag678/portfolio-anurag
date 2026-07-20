@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anurag Baranwal — Backend / Distributed Systems Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* --bg: #0A0E13; */
+    --bg: #0D1420;
+    --panel: #10161F;
+    --panel-2: #0D131B;
+    --hairline: #1E2733;
+    --text: #E7ECF2;
+    --muted: #8B96A5;
+    --dim: #5A6577;
+    --cyan: #6EE7DE;
+    --amber: #F2B84B;
+    --amber-dim: #7A5C28;
+    --red: #E5735C;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  a{ color:inherit; text-decoration:none; }
+  ::selection{ background:var(--amber); color:#0A0E13; }
+
+  :focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(10,14,19,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--hairline);
+  }
+  .nav-inner{
+    max-width:980px; margin:0 auto; padding:0 32px;
+    display:flex; align-items:center; justify-content:space-between;
+    height:56px;
+  }
+  .nav-brand{ font-family:var(--mono); font-size:14px; color:var(--cyan); font-weight:600; }
+  .nav-links{ display:flex; gap:28px; list-style:none; }
+  .nav-links a{
+    font-family:var(--mono); font-size:13px; color:var(--muted);
+    transition:color .15s ease;
+  }
+  .nav-links a:hover{ color:var(--amber); }
+  .nav-links a::before{ content:'~/'; color:var(--dim); }
+  .nav-toggle{ display:none; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding-top:100px; padding-bottom:60px;
+    position:relative;
+    border-bottom:1px solid var(--hairline);
+  }
+  .hero-eyebrow{
+    font-family:var(--mono); font-size:12px; color:var(--dim);
+    letter-spacing:0.08em; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .dot-live{
+    width:7px; height:7px; border-radius:50%; background:var(--amber);
+    box-shadow:0 0 0 0 rgba(242,184,75,0.5);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(242,184,75,0.45); }
+    70%{ box-shadow:0 0 0 8px rgba(242,184,75,0); }
+    100%{ box-shadow:0 0 0 0 rgba(242,184,75,0); }
+  }
+  .hero h1{
+    font-family:var(--mono); font-weight:700;
+    font-size:clamp(34px, 6vw, 64px);
+    line-height:1.08; letter-spacing:-0.01em;
+    color:var(--text);
+  }
+  .hero h1 .cursor{
+    display:inline-block; width:0.5ch; background:var(--cyan);
+    animation:blink 1s steps(1) infinite; margin-left:2px;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .hero-role{
+    font-family:var(--mono); font-size:clamp(15px,2vw,19px);
+    color:var(--cyan); margin-top:14px;
+  }
+  .hero-desc{
+    max-width:560px; margin-top:22px; color:var(--muted); font-size:16px;
+  }
+  .hero-cta{ display:flex; gap:14px; margin-top:34px; flex-wrap:wrap; }
+  .btn{
+    font-family:var(--mono); font-size:13px; padding:11px 20px;
+    border-radius:3px; border:1px solid var(--hairline);
+    transition:all .15s ease; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{ background:var(--amber); color:#141008; border-color:var(--amber); font-weight:600; }
+  .btn-primary:hover{ background:#ffd074; }
+  .btn-ghost{ color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--cyan); color:var(--cyan); }
+
+  /* event stream ticker - signature element */
+  .stream{
+    margin-top:56px; border:1px solid var(--hairline); border-radius:6px;
+    background:var(--panel); overflow:hidden;
+  }
+  .stream-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 16px; border-bottom:1px solid var(--hairline);
+    font-family:var(--mono); font-size:11px; color:var(--dim);
+  }
+  .stream-head .topic{ color:var(--muted); }
+  .stream-dots{ display:flex; gap:6px; }
+  .stream-dots span{ width:8px; height:8px; border-radius:50%; background:var(--hairline); }
+  .stream-body{
+    height:168px; overflow:hidden; position:relative;
+    font-family:var(--mono); font-size:12.5px;
+  }
+  .stream-track{
+    position:absolute; top:0; left:0; width:100%;
+    animation:scrollUp 16s linear infinite;
+  }
+  @keyframes scrollUp{
+    0%{ transform:translateY(0); }
+    100%{ transform:translateY(-50%); }
+  }
+  .stream-line{
+    display:flex; gap:14px; padding:6px 16px;
+    border-bottom:1px solid rgba(30,39,51,0.5);
+    white-space:nowrap;
+  }
+  .stream-ts{ color:var(--dim); }
+  .stream-evt{ color:var(--cyan); min-width:150px; }
+  .stream-meta{ color:var(--muted); }
+  .stream-ok{ color:var(--amber); margin-left:auto; }
+
+  /* ---------- SECTION SHELL ---------- */
+  section{ padding:96px 0; border-bottom:1px solid var(--hairline); }
+  .sec-head{ margin-bottom:44px; }
+  .sec-tag{
+    font-family:var(--mono); font-size:12px; color:var(--dim);
+    letter-spacing:0.06em; margin-bottom:10px;
+  }
+  .sec-tag::before{ content:'// '; color:var(--dim); }
+  .sec-title{
+    font-family:var(--mono); font-weight:700; font-size:clamp(22px,3vw,30px);
+    color:var(--text);
+  }
+
+  /* ---------- ABOUT ---------- */
+  .about-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:56px; align-items:start; }
+  .about-text{ color:var(--muted); font-size:16px; }
+  .about-text strong{ color:var(--text); font-weight:600; }
+  .stat-list{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--hairline); }
+  .stat{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:16px 0; border-bottom:1px solid var(--hairline);
+  }
+  .stat-num{ font-family:var(--mono); font-size:26px; color:var(--amber); font-weight:600; }
+  .stat-label{ font-family:var(--mono); font-size:12px; color:var(--muted); text-align:right; max-width:180px; }
+
+  /* ---------- EXPERIENCE (git-log style) ---------- */
+  .commit{ display:grid; grid-template-columns:120px 1fr; gap:24px; padding:28px 0; border-bottom:1px solid var(--hairline); }
+  .commit:last-child{ border-bottom:none; }
+  .commit-meta{ font-family:var(--mono); font-size:12px; color:var(--dim); }
+  .commit-hash{ color:var(--cyan); display:block; margin-bottom:6px; }
+  .commit-body h3{ font-family:var(--mono); font-size:18px; color:var(--text); font-weight:600; }
+  .commit-body .role-org{ font-size:13px; color:var(--amber); font-family:var(--mono); margin-top:2px; }
+  .commit-body ul{ margin-top:16px; padding-left:18px; color:var(--muted); font-size:14.5px; }
+  .commit-body li{ margin-bottom:9px; }
+  .commit-body li::marker{ color:var(--dim); }
+  .commit-body li b{ color:var(--text); font-weight:600; }
+
+  /* ---------- SKILLS ---------- */
+  .skill-cat{ margin-bottom:26px; }
+  .skill-cat-label{
+    font-family:var(--mono); font-size:12px; color:var(--dim);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;
+  }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:9px; }
+  .chip{
+    font-family:var(--mono); font-size:12.5px; color:var(--muted);
+    border:1px solid var(--hairline); padding:7px 12px; border-radius:3px;
+    transition:all .15s ease;
+  }
+  .chip:hover{ border-color:var(--cyan); color:var(--cyan); }
+
+  /* ---------- PROJECT / DIAGRAM ---------- */
+  .project-card{
+    border:1px solid var(--hairline); border-radius:6px; background:var(--panel);
+    overflow:hidden;
+  }
+  .project-head{ padding:22px 26px; border-bottom:1px solid var(--hairline); }
+  .project-head h3{ font-family:var(--mono); font-size:19px; color:var(--text); }
+  .project-head p{ color:var(--muted); font-size:14.5px; margin-top:8px; max-width:600px; }
+  .project-diagram{ padding:28px; background:var(--panel-2); }
+  .project-tags{ display:flex; gap:8px; padding:18px 26px; flex-wrap:wrap; border-top:1px solid var(--hairline); }
+
+  /* ---------- EDUCATION / ACHIEVEMENTS ---------- */
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:56px; }
+  .edu-card{ border-left:2px solid var(--amber); padding-left:20px; }
+  .edu-card h3{ font-family:var(--mono); font-size:16px; color:var(--text); }
+  .edu-card .org{ color:var(--muted); font-size:14px; margin-top:4px; }
+  .edu-card .cgpa{ font-family:var(--mono); font-size:13px; color:var(--cyan); margin-top:10px; }
+
+  .term-block{
+    font-family:var(--mono); font-size:13px; background:var(--panel);
+    border:1px solid var(--hairline); border-radius:6px; padding:18px 20px;
+  }
+  .term-block .term-cmd{ color:var(--dim); margin-bottom:12px; }
+  .term-block .term-cmd::before{ content:'$ '; color:var(--amber); }
+  .term-line{ display:flex; gap:10px; padding:5px 0; color:var(--muted); }
+  .term-line .pass{ color:var(--amber); }
+
+  /* ---------- CONTACT / FOOTER ---------- */
+  footer{ padding:80px 0 40px; }
+  .contact-title{
+    font-family:var(--mono); font-weight:700; font-size:clamp(26px,4vw,40px);
+    color:var(--text); max-width:640px;
+  }
+  .contact-title span{ color:var(--cyan); }
+  .contact-links{ display:flex; flex-wrap:wrap; gap:16px; margin-top:38px; }
+  .contact-links a{
+    font-family:var(--mono); font-size:13.5px; color:var(--muted);
+    border:1px solid var(--hairline); padding:12px 18px; border-radius:3px;
+    transition:all .15s ease; display:flex; align-items:center; gap:8px;
+  }
+  .contact-links a:hover{ border-color:var(--cyan); color:var(--cyan); }
+  .foot-note{ margin-top:60px; color:var(--dim); font-family:var(--mono); font-size:12px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:760px){
+    .nav-links{ display:none; }
+    .about-grid, .two-col{ grid-template-columns:1fr; }
+    .commit{ grid-template-columns:1fr; }
+    section{ padding:64px 0; }
+    .wrap{ padding:0 20px; }
+    .nav-inner{ padding:0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">anurag@backend:~$</div>
+    <ul class="nav-links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#experience">experience</a></li>
+      <li><a href="#skills">skills</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap" style="border-bottom:1px solid var(--hairline);">
+    <div class="hero-eyebrow"><span class="dot-live"></span> AVAILABLE — BENGALURU, INDIA</div>
+    <h1>Anurag Baranwal<span class="cursor">&nbsp;</span></h1>
+    <div class="hero-role">Software Engineer — Backend &amp; Distributed Systems</div>
+    <p class="hero-desc">I build event-driven microservices that keep lending platforms honest at scale — Kafka pipelines, token-based auth, and APIs that hold up under real concurrent load. Three years in, still happiest debugging a race condition at 2am.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="mailto:bk2anurag@gmail.com">Say hello →</a>
+      <a class="btn btn-ghost" href="https://github.com/rag678" target="_blank" rel="noopener">github.com/rag678</a>
+      <a class="btn btn-ghost" href="https://linkedin.com/in/rag678" target="_blank" rel="noopener">linkedin.com/in/rag678</a>
+    </div>
+
+    <div class="stream">
+      <div class="stream-head">
+        <span class="topic">topic: lending.lifecycle.events</span>
+        <div class="stream-dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="stream-body">
+        <div class="stream-track" id="streamTrack"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">summary</div>
+      <h2 class="sec-title">About</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I'm a backend engineer focused on <strong>event-driven, distributed systems</strong> — mostly in Java and Spring Boot, with Kafka doing the heavy lifting between services. Most of my work lives inside a multi-stage lending platform: designing the APIs, modelling the workflow, and making sure the analytics behind it actually mean something.</p>
+        <br>
+        <p>I care about the unglamorous parts — token caching that cuts response time under load, RCA that finds the actual root cause, migrations that quietly remove a class of bugs. No front-end in this portfolio's projects because there's none in mine either; what I ship is APIs, pipelines, and the infrastructure decisions around them.</p>
+      </div>
+      <div class="stat-list">
+        <div class="stat"><span class="stat-num">3+ yrs</span><span class="stat-label">professional backend engineering</span></div>
+        <div class="stat"><span class="stat-num">10,000+</span><span class="stat-label">loan lifecycle events processed / day</span></div>
+        <div class="stat"><span class="stat-num">76%</span><span class="stat-label">API latency reduction via token caching</span></div>
+        <div class="stat"><span class="stat-num">1,000+</span><span class="stat-label">DSA problems solved (GFG / LeetCode)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">git log --author=anurag</div>
+      <h2 class="sec-title">Experience</h2>
+    </div>
+
+    <div class="commit">
+      <div class="commit-meta"><span class="commit-hash">#a1b2c3</span>Jun 2023 — Present</div>
+      <div class="commit-body">
+        <h3>Software Engineer</h3>
+        <div class="role-org">Lending Labs (Finvolv), Bengaluru</div>
+        <ul>
+          <li>Designed a real-time <b>event-driven microservices</b> component for the lending workflow, using <b>Kafka</b> to asynchronously process 10,000+ loan lifecycle events/day, with analytics stored in <b>Druid</b>.</li>
+          <li>Architected backend solutions with <b>Spring Boot, JPA, and Liquibase</b> for a multi-stage, multi-user lending platform.</li>
+          <li>Introduced token caching for third-party API authorization, cutting response time from 30s to 7s at 1,000 concurrent requests — a <b>76% improvement</b>.</li>
+          <li>Built analytics pipelines and <b>Superset</b> dashboards covering loan approvals, claim volumes, rejection trends, and disbursement.</li>
+          <li>Owned change requests end-to-end: requirement analysis, backend development, technical decisions, production support.</li>
+          <li>Built a redundant-case elimination module, improving system efficiency by <b>30%</b>.</li>
+          <li>Integrated <b>DigiLocker</b> for KYC verification, speeding up onboarding.</li>
+          <li>Ran production support and RCA to keep the platform reliable.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="commit">
+      <div class="commit-meta"><span class="commit-hash">#d4e5f6</span>Nov 2022 — May 2023</div>
+      <div class="commit-body">
+        <h3>Software Engineer Intern</h3>
+        <div class="role-org">Kuliza Technologies (Finvolv), Bengaluru</div>
+        <ul>
+          <li>Built reusable APIs adopted across multiple projects.</li>
+          <li>Translated client requirements into scalable backend logic and workflows.</li>
+          <li>Implemented a fraud and authenticity verification feature for loan applicants and associated entities.</li>
+          <li>Migrated third-party integrations from <b>SOAP to REST</b>, improving auth and performance.</li>
+          <li>Picked up backend fundamentals — REST design, auth flows, reliability — on production-grade lending workflows.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">stack</div>
+      <h2 class="sec-title">Skills</h2>
+    </div>
+
+    <div class="skill-cat">
+      <div class="skill-cat-label">Distributed Systems &amp; Messaging</div>
+      <div class="chip-row">
+        <span class="chip">Event-Driven Microservices</span><span class="chip">Apache Kafka</span><span class="chip">Asynchronous Processing</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-label">Backend &amp; Frameworks</div>
+      <div class="chip-row">
+        <span class="chip">Spring Boot</span><span class="chip">Hibernate</span><span class="chip">REST APIs</span><span class="chip">Microservices</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-label">Cloud &amp; DevOps</div>
+      <div class="chip-row">
+        <span class="chip">Kubernetes</span><span class="chip">AWS EC2</span><span class="chip">CloudWatch</span><span class="chip">Linux</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-label">Languages &amp; Databases</div>
+      <div class="chip-row">
+        <span class="chip">Java</span><span class="chip">C++</span><span class="chip">PostgreSQL</span><span class="chip">SQL</span><span class="chip">Druid</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-label">Testing &amp; Tools</div>
+      <div class="chip-row">
+        <span class="chip">JUnit</span><span class="chip">Mockito</span><span class="chip">Maven</span><span class="chip">Git</span><span class="chip">Postman</span>
+      </div>
+    </div>
+    <div class="skill-cat">
+      <div class="skill-cat-label">CS Fundamentals</div>
+      <div class="chip-row">
+        <span class="chip">Data Structures &amp; Algorithms</span><span class="chip">OOP</span><span class="chip">Operating Systems</span><span class="chip">Multithreading</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">selected work</div>
+      <h2 class="sec-title">Projects</h2>
+    </div>
+
+    <div class="project-card">
+      <div class="project-head">
+        <h3>Distributed API Gateway &amp; Rate Limiter</h3>
+        <p>A Redis-backed gateway on Spring Cloud Gateway that centralizes request routing and throttles traffic across backend services using a custom token-bucket filter.</p>
+      </div>
+      <div class="project-diagram">
+        <svg viewBox="0 0 760 220" width="100%" role="img" aria-label="Architecture diagram: clients send requests to the API gateway, which checks a Redis token bucket before routing to backend services">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#5A6577" />
+            </marker>
+          </defs>
+
+          <!-- clients -->
+          <g>
+            <rect x="10" y="70" width="110" height="40" rx="4" fill="none" stroke="#1E2733"/>
+            <text x="65" y="94" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="12" text-anchor="middle">Clients</text>
+          </g>
+
+          <line x1="120" y1="90" x2="180" y2="90" stroke="#5A6577" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+          <!-- gateway -->
+          <g>
+            <rect x="182" y="55" width="180" height="70" rx="5" fill="#10161F" stroke="#F2B84B" stroke-width="1.3"/>
+            <text x="272" y="84" fill="#F2B84B" font-family="IBM Plex Mono, monospace" font-size="12.5" text-anchor="middle" font-weight="600">API Gateway</text>
+            <text x="272" y="102" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="10.5" text-anchor="middle">Spring Cloud Gateway</text>
+          </g>
+
+          <line x1="272" y1="125" x2="272" y2="160" stroke="#5A6577" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+          <!-- redis -->
+          <g>
+            <rect x="182" y="162" width="180" height="46" rx="5" fill="none" stroke="#1E2733"/>
+            <text x="272" y="181" fill="#6EE7DE" font-family="IBM Plex Mono, monospace" font-size="11.5" text-anchor="middle">Redis</text>
+            <text x="272" y="197" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">token bucket state</text>
+          </g>
+
+          <line x1="362" y1="90" x2="430" y2="90" stroke="#5A6577" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+          <!-- backend services -->
+          <g>
+            <rect x="432" y="20" width="150" height="42" rx="4" fill="none" stroke="#1E2733"/>
+            <text x="507" y="46" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="11.5" text-anchor="middle">Service A</text>
+          </g>
+          <g>
+            <rect x="432" y="70" width="150" height="42" rx="4" fill="none" stroke="#1E2733"/>
+            <text x="507" y="96" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="11.5" text-anchor="middle">Service B</text>
+          </g>
+          <g>
+            <rect x="432" y="120" width="150" height="42" rx="4" fill="none" stroke="#1E2733"/>
+            <text x="507" y="146" fill="#8B96A5" font-family="IBM Plex Mono, monospace" font-size="11.5" text-anchor="middle">Service C</text>
+          </g>
+
+          <line x1="362" y1="90" x2="432" y2="41" stroke="#5A6577" stroke-width="1" marker-end="url(#arrow)"/>
+          <line x1="362" y1="90" x2="432" y2="141" stroke="#5A6577" stroke-width="1" marker-end="url(#arrow)"/>
+
+          <!-- flowing token dot -->
+          <circle r="4" fill="#F2B84B">
+            <animateMotion dur="3.5s" repeatCount="indefinite"
+              path="M65,90 L272,90 L272,90 L507,41" />
+          </circle>
+
+          <text x="10" y="30" fill="#5A6577" font-family="IBM Plex Mono, monospace" font-size="10.5">throttled request flow →</text>
+        </svg>
+      </div>
+      <div class="project-tags">
+        <span class="chip">Spring Cloud Gateway</span><span class="chip">Redis</span><span class="chip">Token Bucket Algorithm</span><span class="chip">Rate Limiting</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION + ACHIEVEMENTS -->
+  <section class="wrap">
+    <div class="two-col">
+      <div>
+        <div class="sec-head">
+          <div class="sec-tag">education</div>
+          <h2 class="sec-title" style="font-size:20px;">Education</h2>
+        </div>
+        <div class="edu-card">
+          <h3>B.Tech, Computer Science</h3>
+          <div class="org">GL Bajaj Institute of Technology and Management, India</div>
+          <div class="cgpa">CGPA: 8.14 / 10</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sec-head">
+          <div class="sec-tag">achievements --list</div>
+          <h2 class="sec-title" style="font-size:20px;">Achievements</h2>
+        </div>
+        <div class="term-block">
+          <div class="term-cmd">achievements --list</div>
+          <div class="term-line"><span class="pass">PASS</span> 1000+ problems solved — GeeksforGeeks &amp; LeetCode</div>
+          <div class="term-line"><span class="pass">PASS</span> Pupil @ Codeforces — Global Rank 3769, top 15% (Round 816)</div>
+          <div class="term-line"><span class="pass">PASS</span> Rank 3629 — Google Kick Start, Round D</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <footer id="contact" class="wrap">
+    <div class="sec-tag">get in touch</div>
+    <h2 class="contact-title">Building something with real throughput problems? <span>Let's talk.</span></h2>
+    <div class="contact-links">
+      <a href="mailto:bk2anurag@gmail.com">✉ bk2anurag@gmail.com</a>
+      <a href="tel:+917052969589">☎ +91 7052969589</a>
+      <a href="https://linkedin.com/in/rag678" target="_blank" rel="noopener">in/rag678</a>
+      <a href="https://github.com/rag678" target="_blank" rel="noopener">github.com/rag678</a>
+    </div>
+    <div class="foot-note">
+      <span>Anurag Baranwal — Backend Engineer</span>
+      <span>Bengaluru, India</span>
+    </div>
+  </footer>
+</main>
+
+<script>
+  // Build the Kafka-style event stream ticker in the hero
+  const events = [
+    ['loan.created', 'partition=2 offset=88213', '201'],
+    ['loan.kyc.verified', 'partition=0 offset=71029', '200'],
+    ['loan.approved', 'partition=3 offset=88214', '200'],
+    ['loan.disbursed', 'partition=1 offset=55031', '200'],
+    ['loan.claim.raised', 'partition=2 offset=88215', '202'],
+    ['loan.rejected', 'partition=0 offset=71030', '200'],
+    ['kyc.digilocker.synced', 'partition=4 offset=12093', '200'],
+    ['loan.duplicate.flagged', 'partition=3 offset=88216', '200'],
+    ['loan.token.refreshed', 'partition=1 offset=55032', '200'],
+    ['loan.analytics.aggregated', 'partition=2 offset=88217', '200'],
+  ];
+
+  function timestamp(offsetSec){
+    const d = new Date(Date.now() - offsetSec*1000);
+    return d.toTimeString().slice(0,8);
+  }
+
+  function buildLines(){
+    let html = '';
+    // duplicate list twice for seamless scroll loop
+    for (let rep = 0; rep < 2; rep++){
+      events.forEach((e, i) => {
+        html += `<div class="stream-line">
+          <span class="stream-ts">${timestamp((events.length*rep)+i)}</span>
+          <span class="stream-evt">${e[0]}</span>
+          <span class="stream-meta">${e[1]}</span>
+          <span class="stream-ok">${e[2]} OK</span>
+        </div>`;
+      });
+    }
+    return html;
+  }
+
+  const track = document.getElementById('streamTrack');
+  if (track){ track.innerHTML = buildLines(); }
+</script>
+
+</body>
+</html>
